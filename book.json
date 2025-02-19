@@ -1,0 +1,14 @@
+{
+  "root": ".",
+  "title": "Paypal Go SDK",
+  "plugins": ["edit-link", "github", "prism", "-highlight", "anchorjs", "sitemap", "ga", "anchors", "sitemap"],
+  "pluginsConfig": {
+    "edit-link": {
+      "base": "https://github.com/cnlangzi/paypal-go/tree/main",
+      "label": "Edit This Page"
+    },
+    "github": {
+      "url": "https://github.com/cnlangzi/paypal-go/"
+    }
+  }
+}
