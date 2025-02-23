@@ -19,12 +19,20 @@ func NewCreateOrderRequest(unit PurchaseUnit, options ...CreateOrderOption) *Cre
 
 }
 
+// CreatedOrder represents a PayPal order that has been created.
+// It contains the ID, status, and links related to the order.
+type CreatedOrder struct {
+	ID     string `json:"id"`     // The unique identifier for the order.
+	Status Status `json:"status"` // The current status of the order.
+	Links  []Link `json:"links"`  // Related links for the order actions.
+}
+
 // CreateOrderRequest represents the request body of the Create Order API.
 // It contains the intent of the order, the purchase units, and the payment source.
 type CreateOrderRequest struct {
-	Intent        OrderIntent           `json:"intent"`
-	PurchaseUnits []PurchaseUnit        `json:"purchase_units"`
-	PaymentSource map[PaymentSource]any `json:"payment_source,omitempty"`
+	Intent        OrderIntent    `json:"intent"`
+	PurchaseUnits []PurchaseUnit `json:"purchase_units"`
+	PaymentSource PaymentSource  `json:"payment_source,omitzero"`
 }
 
 // CreateOrderOption is a function that take a pointer to a CreateOrderRequest and modify it.
@@ -49,16 +57,11 @@ func WithPurchaseUnit(units ...PurchaseUnit) CreateOrderOption {
 	}
 }
 
-// WithPaymentSource sets the payment source for the CreateOrderRequest.
-// It takes a PaymentSource and a value, and adds them to the PaymentSource map in the request.
-func WithPaymentSource(name PaymentSource, value any) CreateOrderOption {
+// WithPaypalPaymentSources sets the payment source of the CreateOrderRequest to the given PayPalPaymentSource.
+//
+// It takes a PaypalPaymentSource as an argument, and sets the PaymentSource field in the request to it.
+func WithPaypalPaymentSources(s PaypalPaymentSource) CreateOrderOption {
 	return func(req *CreateOrderRequest) {
-		req.PaymentSource[name] = value
+		req.PaymentSource.Paypal = s
 	}
-}
-
-type Order struct {
-	ID     string `json:"id"`
-	Status string `json:"status"`
-	Links  []Link `json:"links"`
 }

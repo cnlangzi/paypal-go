@@ -79,15 +79,15 @@ func (c *Client) getAccessToken(ctx context.Context) (*AccessToken, error) {
 	return &token, nil
 }
 
-func (c *Client) CreateOrder(ctx context.Context, unit PurchaseUnit, options ...CreateOrderOption) (*Order, error) {
+// CreateOrder creates a new order with the given purchase unit and options.
+// It sends a request to the PayPal API to create the order and returns the created order details or an error.
+func (c *Client) CreateOrder(ctx context.Context, unit PurchaseUnit, options ...CreateOrderOption) (*CreatedOrder, error) {
 
-	buf, _ := json.Marshal(NewCreateOrderRequest(unit, options...))
+	cor := NewCreateOrderRequest(unit, options...)
 
-	req, _ := http.NewRequest(http.MethodPost, c.apiHost+"/v2/checkout/orders/", bytes.NewBuffer(buf))
-	req.Header.Set("Authorization", "Bearer "+c.GetAccessToken(ctx).AccessToken)
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := c.createRequest(ctx, http.MethodPost, "/v2/checkout/orders/", cor)
 
-	var o Order
+	var o CreatedOrder
 
 	e, err := c.doRequest(ctx, req, &o)
 
@@ -100,6 +100,38 @@ func (c *Client) CreateOrder(ctx context.Context, unit PurchaseUnit, options ...
 	}
 
 	return &o, nil
+}
+
+// CaptureOrder captures a previously created order by its ID.
+// It sends a request to the PayPal API to capture the order and returns the captured order details or an error.
+func (c *Client) CaptureOrder(ctx context.Context, orderID string) (*CapturedOrder, error) {
+	req, _ := c.createRequest(ctx, http.MethodPost, "/v2/checkout/orders/"+orderID+"/capture", nil)
+
+	var o CapturedOrder
+	e, err := c.doRequest(ctx, req, &o)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if e != nil {
+		return nil, e
+	}
+
+	return &o, nil
+}
+
+func (c *Client) createRequest(ctx context.Context, method string, path string, body any) (*http.Request, error) {
+	var buf []byte
+	if body != nil {
+		buf, _ = json.Marshal(body)
+	}
+
+	req, _ := http.NewRequest(method, c.apiHost+path, bytes.NewBuffer(buf))
+	req.Header.Set("Authorization", "Bearer "+c.GetAccessToken(ctx).AccessToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	return req, nil
 }
 
 func (c *Client) doRequest(ctx context.Context, req *http.Request, result any) (*PaypalError, error) {

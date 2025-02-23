@@ -1,5 +1,30 @@
 package paypal
 
+type Status string
+
+const (
+	StatusCreated   Status = "CREATED"
+	StatusCompleted Status = "COMPLETED"
+
+	StatusEligible           Status = "ELIGIBLE"
+	StatusInstrumentDeclined Status = "INSTRUMENT_DECLINED"
+
+	StatusFailed Status = "FAILED"
+
+	StatusRecoverable Status = "RECOVERABLE"
+
+	// OrderStatusApproved   Status = "APPROVED"
+	// OrderStatusCaptured   Status = "CAPTURED"
+	// OrderStatusExpired    Status = "EXPIRED"
+	// OrderStatusFailed     Status = "FAILED"
+	// OrderStatusInReview   Status = "IN_REVIEW"
+	// OrderStatusPartially  Status = "PARTIALLY_PAID"
+	// OrderStatusProcessing Status = "PROCESSING"
+	// OrderStatusRefunded   Status = "REFUNDED"
+	// OrderStatusRevoked    Status = "REVOKED"
+	// OrderStatusVoided     Status = "VOIDED"
+)
+
 type PaypalError struct {
 	Name       string         `json:"name"`
 	Message    string         `json:"message"`

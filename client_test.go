@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	TEST_ClientID = "AePKFcOP3dwCy1HRe6-GRs9goCCERgIet7w7sQeHD172IF12Iay9lET7JjgSwF0VrP-EzArGwbQXDJEe"
-	TEST_Secret   = "EM4MkXpLY-GFlsEHSYzXWY9mV0Kmv-N3dPXAX_Cid4lDeyG1Gw88923wXVWKpKfaDuSaAs1RUctrsMdn"
+	TEST_ClientID = "AfHi2_hDAfVtrxAeZSCf0ni6ksHQcPhrHQPOED7Jj6fKjdpa2_e-hIgN1j7x8ReMseFocow9BfsId3oV"
+	TEST_Secret   = "EJFIzsOAQ-fkvj3_e4PA2_mpHiukNRMFgA66Q0mdHGe8HW8F7ngOxOQXO7LmeFbvo8qQCydrsfqcII2l"
 )
 
 var (
@@ -50,7 +50,17 @@ func TestOrder(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, o)
 		require.NotEmpty(t, o.ID)
-		require.Equal(t, "CREATED", o.Status)
+		require.Equal(t, StatusCreated, o.Status)
+
+		co, err := client.CaptureOrder(context.TODO(), o.ID)
+
+		require.Error(t, err)
+		require.Nil(t, co)
+
+		pe := err.(*PaypalError)
+		require.Equal(t, 422, pe.StatusCode)
+		require.Equal(t, "UNPROCESSABLE_ENTITY", pe.Name)
+		require.Equal(t, "ORDER_NOT_APPROVED", pe.Details[0].Issue)
 
 	})
 }
