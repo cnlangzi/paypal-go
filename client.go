@@ -16,6 +16,7 @@ import (
 
 const (
 	SandboxHost = "https://api-m.sandbox.paypal.com"
+	Host        = "https://api-m.paypal.com"
 )
 
 type Client struct {
@@ -36,6 +37,10 @@ func New(clientID, secret string) *Client {
 
 		apiHost: SandboxHost,
 	}
+}
+
+func (c *Client) SwitchToLive() {
+	c.apiHost = Host
 }
 
 func (c *Client) GetAccessToken(ctx context.Context) *AccessToken {
